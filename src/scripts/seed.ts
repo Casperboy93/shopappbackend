@@ -19,7 +19,7 @@ export async function seedAdminAndData() {
   const userRepo = dataSource.getRepository(User);
   const serviceRepo = dataSource.getRepository(Service);
 
-  const existingAdmin = await userRepo.findOne({ where: { email: 'bsadmin' } });
+  const existingAdmin = await userRepo.findOne({ where: { email: 'admin@test.com' } });
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('admin123', 10);
     const admin = userRepo.create({
