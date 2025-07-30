@@ -28,12 +28,12 @@ import { ScheduleModule } from '@nestjs/schedule';
         type: 'postgres',
         url: config.get<string>('DATABASE_URL'),
         ssl: {
-          rejectUnauthorized: false, // Required by Supabase
+          rejectUnauthorized: false,
         },
-        entities: [User, RegistrationRequest, Subscription, SupportMessage, Service, Notification],
-        synchronize: true, // ⚠️ Disable in production
+        synchronize: true, // set false for production
+        autoLoadEntities: true,
       }),
-    }),
+    }) ,
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
