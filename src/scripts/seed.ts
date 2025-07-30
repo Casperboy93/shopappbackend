@@ -1,12 +1,11 @@
 import { config } from 'dotenv';
-config(); // Load .env
+config();
 
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, UserRole, UserStatus } from '../user/entities/user.entity';
 import { Service } from '../services/entities/service.entity';
 
-// Initialize datasource
 const dataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
@@ -15,12 +14,11 @@ const dataSource = new DataSource({
   synchronize: false,
 });
 
-async function seed() {
+export async function seedAdminAndData() {
   await dataSource.initialize();
   const userRepo = dataSource.getRepository(User);
   const serviceRepo = dataSource.getRepository(Service);
 
-  // Seed Admin
   const existingAdmin = await userRepo.findOne({ where: { email: 'bsadmin' } });
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('admin123', 10);
@@ -39,9 +37,10 @@ async function seed() {
     });
     await userRepo.save(admin);
     console.log('✅ Admin created');
+  } else {
+    console.log('ℹ️ Admin already exists');
   }
 
-  // Seed 20 Users
   for (let i = 1; i <= 20; i++) {
     const email = `user${i}@test.com`;
     const existing = await userRepo.findOne({ where: { email } });
@@ -57,14 +56,13 @@ async function seed() {
         address: '123 Street',
         job: 'Freelancer',
         status: UserStatus.ACTIVE,
-        profileImg: `https://example.com/img/user${i}.png`,
+        profileImg: `https://i.pravatar.cc/300?img=${i}`,
       });
       await userRepo.save(user);
     }
   }
   console.log('✅ 20 users created');
 
-  // Seed 10 Services
   const cities = ['Casablanca', 'Rabat', 'Fes'];
   for (let i = 1; i <= 10; i++) {
     const service = serviceRepo.create({
@@ -72,8 +70,8 @@ async function seed() {
       pricing: 50 + i * 10,
       description: `This is the description for service ${i}`,
       serviceImgs: [
-        `https://example.com/img/service${i}_1.png`,
-        `https://example.com/img/service${i}_2.png`,
+        `https://picsum.photos/seed/service${i}a/300/200`,
+        `https://picsum.photos/seed/service${i}b/300/200`,
       ],
       deliveryTime: `${2 + i} days`,
       citiesCovered: cities,
@@ -82,10 +80,12 @@ async function seed() {
   }
   console.log('✅ 10 services created');
 
-  process.exit(0);
+  await dataSource.destroy();
 }
 
-seed().catch((e) => {
-  console.error('❌ Seed error:', e);
-  process.exit(1);
-});
+if (require.main === module) {
+  seedAdminAndData().catch((e) => {
+    console.error('❌ Seed error:', e);
+    process.exit(1);
+  });
+}

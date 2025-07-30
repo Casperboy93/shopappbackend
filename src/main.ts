@@ -4,14 +4,15 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
+import { seedAdminAndData } from './scripts/seed'; // seed.ts
+
 async function bootstrap() {
   dotenv.config();
   const app = await NestFactory.create(AppModule);
 
-  // ✅ Allow frontend to access backend
   app.enableCors({
-    origin: 'http://localhost:5173', // frontend Vite dev server
-    credentials: true,               // required if using cookies for auth
+    origin: 'http://localhost:5173', // ⚠️ change this to your frontend URL in prod
+    credentials: true,
   });
 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
@@ -20,13 +21,21 @@ async function bootstrap() {
     .setTitle('BS Backend API')
     .setDescription('API documentation for the freelancing platform')
     .setVersion('1.0')
-    .addBearerAuth() // Enables "Authorize" in Swagger for JWT
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
   await app.listen(process.env.PORT || 3000);
+
+  // ✅ Run the seed logic
+  try {
+    await seedAdminAndData();
+    console.log('✅ Seed executed successfully (admin/users/services)');
+  } catch (err) {
+    console.error('❌ Seed failed:', err.message);
+  }
 }
 
 bootstrap();
