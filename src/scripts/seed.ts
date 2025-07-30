@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 config();
-
+import { Subscription } from '../subscriptions/entities/subscription.entity';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { User, UserRole, UserStatus } from '../user/entities/user.entity';
@@ -10,9 +10,10 @@ const dataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
-  entities: [User, Service],
+  entities: [User, Service, Subscription], // ← ✅ Add all used entities here
   synchronize: false,
 });
+
 
 export async function seedAdminAndData() {
   await dataSource.initialize();
