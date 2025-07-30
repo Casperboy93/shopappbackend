@@ -26,8 +26,12 @@ import { ScheduleModule } from '@nestjs/schedule';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
+        url: config.get<string>('DATABASE_URL'),
+        ssl: {
+          rejectUnauthorized: false, // Required by Supabase
+        },
         entities: [User, RegistrationRequest, Subscription, SupportMessage, Service, Notification],
-        synchronize: true, // set to false in production!
+        synchronize: true, // ⚠️ Disable in production
       }),
     }),
     ScheduleModule.forRoot(),
