@@ -30,10 +30,11 @@ import { ScheduleModule } from '@nestjs/schedule';
         ssl: {
           rejectUnauthorized: false,
         },
-        synchronize: true, // set false for production
+        synchronize: true, // ⚠️ Disable in production
         autoLoadEntities: true,
       }),
-    }) ,
+    }),
+    
     ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
