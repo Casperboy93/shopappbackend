@@ -26,12 +26,6 @@ import { ScheduleModule } from '@nestjs/schedule';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        url : process.env.DATABASE_URL,
-        host: config.get('DB_HOST'),
-        port: +config.get<number>('DB_PORT', 5432),
-        username: config.get('DB_USERNAME'),
-        password: config.get('DB_PASSWORD'),
-        database: config.get('DB_NAME'),
         entities: [User, RegistrationRequest, Subscription, SupportMessage, Service, Notification],
         synchronize: true, // set to false in production!
       }),
