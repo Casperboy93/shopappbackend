@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'http://localhost:5173', // ⚠️ change this to your frontend URL in prod
+    origin: 'https://uncomplicated.onrender.com/', // ⚠️ change this to your frontend URL in prod
     credentials: true,
   });
 

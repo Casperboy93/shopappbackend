@@ -26,7 +26,7 @@ export async function seedAdminAndData() {
     const admin = userRepo.create({
       firstName: 'Super',
       lastName: 'Admin',
-      email: 'bsadmin',
+      email: 'admin@test.com',
       password: hashedPassword,
       phone: '0000000000',
       dob: new Date('1990-01-01'),
