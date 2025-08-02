@@ -1,25 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity()
+export type SupportMessageDocument = SupportMessage & Document;
+
+@Schema({ timestamps: true })
 export class SupportMessage {
-  @PrimaryGeneratedColumn()
-  id: number;
+  _id?: any; // Mongoose auto-generated _id (removed @Prop decorator)
 
-  @Column()
+  @ApiProperty()
+  @Prop({ required: true })
   fullName: string;
 
-  @Column()
+  @ApiProperty()
+  @Prop({ required: true })
   phone: string;
 
-  @Column()
+  @ApiProperty()
+  @Prop({ required: true })
   email: string;
 
-  @Column()
+  @ApiProperty()
+  @Prop({ required: true })
   title: string;
 
-  @Column('text')
+  @ApiProperty()
+  @Prop({ required: true })
   message: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+export const SupportMessageSchema = SchemaFactory.createForClass(SupportMessage);

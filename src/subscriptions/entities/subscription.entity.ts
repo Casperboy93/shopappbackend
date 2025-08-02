@@ -1,18 +1,27 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
-import { User } from '../../user/entities/user.entity';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity('subscription')
+export type SubscriptionDocument = Subscription & Document;
+
+@Schema({ timestamps: true })
 export class Subscription {
-  @PrimaryGeneratedColumn()
-  id: number;
+  _id?: any; // Mongoose auto-generated _id (removed @Prop decorator)
 
-  @ManyToOne(() => User, (user) => user.subscriptions)
-  @JoinColumn({ name: 'user_id' })
-  user: User;
+  @ApiProperty()
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  user: Types.ObjectId;
 
-  @Column({ type: 'timestamp' })
+  @ApiProperty()
+  @Prop({ required: true, type: Date })
   startDate: Date;
 
-  @Column({ type: 'timestamp' })
+  @ApiProperty()
+  @Prop({ required: true, type: Date })
   endDate: Date;
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+export const SubscriptionSchema = SchemaFactory.createForClass(Subscription);

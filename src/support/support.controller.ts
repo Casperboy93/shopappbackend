@@ -19,16 +19,16 @@ export class SupportController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.supportService.findOne(+id);
+    return this.supportService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() dto: UpdateSupportMessageDto) {
-    return this.supportService.update(+id, dto);
+    return this.supportService.update(id, dto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.supportService.remove(+id);
+    return this.supportService.remove(id);
   }
 }

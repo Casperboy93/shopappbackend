@@ -1,24 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Notification, NotificationType } from './entities/notification.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Notification, NotificationDocument, NotificationType } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 
 @Injectable()
 export class NotificationsService {
   constructor(
-    @InjectRepository(Notification)
-    private readonly notificationRepo: Repository<Notification>,
+    @InjectModel(Notification.name)
+    private readonly notificationModel: Model<NotificationDocument>,
   ) {}
 
-  create(dto: CreateNotificationDto) {
-    const notification = this.notificationRepo.create(dto);
-    return this.notificationRepo.save(notification);
+  async create(dto: CreateNotificationDto) {
+    const notification = new this.notificationModel(dto);
+    return notification.save();
   }
 
   async countByType(): Promise<Record<string, number>> {
-    const all = await this.notificationRepo.find();
+    const all = await this.notificationModel.find().exec();
     const result: Record<string, number> = {};
   
     for (const notif of all) {
@@ -28,28 +28,23 @@ export class NotificationsService {
     return result;
   }
 
-  findAll() {
-    return this.notificationRepo.find({
-      order: { createdAt: 'DESC' },
-    });
+  async findAll() {
+    return this.notificationModel.find().sort({ createdAt: -1 }).exec();
   }
 
-  findOne(id: number) {
-    return this.notificationRepo.findOneBy({ id });
+  async findOne(id: string) {
+    return this.notificationModel.findById(id).exec();
   }
 
-  async update(id: number, dto: UpdateNotificationDto) {
-    const notification = await this.notificationRepo.findOneBy({ id });
+  async update(id: string, dto: UpdateNotificationDto) {
+    const notification = await this.notificationModel.findByIdAndUpdate(id, dto, { new: true }).exec();
     if (!notification) throw new NotFoundException('Notification not found');
-
-    Object.assign(notification, dto);
-    return this.notificationRepo.save(notification);
+    return notification;
   }
 
-  async remove(id: number) {
-    const notification = await this.notificationRepo.findOneBy({ id });
+  async remove(id: string) {
+    const notification = await this.notificationModel.findByIdAndDelete(id).exec();
     if (!notification) throw new NotFoundException('Notification not found');
-
-    await this.notificationRepo.remove(notification);
+    return notification;
   }
 }

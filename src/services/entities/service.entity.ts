@@ -1,28 +1,39 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 
-@Entity()
+export type ServiceDocument = Service & Document;
+
+@Schema({ timestamps: true })
 export class Service {
-  @PrimaryGeneratedColumn()
-  id: number;
+  _id?: any; // Mongoose auto-generated _id
 
-  @Column()
+  @ApiProperty()
+  @Prop({ required: true })
   serviceName: string;
 
-  @Column('float')
+  @ApiProperty()
+  @Prop({ required: true, type: Number })
   pricing: number;
 
-  @Column('text')
+  @ApiProperty()
+  @Prop({ required: true })
   description: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @Column('text', { array: true })
+  @ApiProperty()
+  @Prop({ type: [String], required: true })
   serviceImgs: string[];
 
-  @Column()
+  @ApiProperty()
+  @Prop({ required: true })
   deliveryTime: string;
 
-  @Column('text', { array: true })
+  @ApiProperty()
+  @Prop({ type: [String], required: true })
   citiesCovered: string[];
+
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+export const ServiceSchema = SchemaFactory.createForClass(Service);

@@ -1,4 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { ApiProperty } from '@nestjs/swagger';
 
 export enum NotificationType {
   REGISTRATION = 'REGISTRATION',
@@ -7,26 +9,31 @@ export enum NotificationType {
   ENDING_SOON = 'ENDING_SOON',
 }
 
-@Entity()
-export class Notification {
-  @PrimaryGeneratedColumn()
-  id: number;
+export type NotificationDocument = Notification & Document;
 
-  @Column()
+@Schema({ timestamps: true })
+export class Notification {
+  @Prop({ type: Types.ObjectId, auto: true })
+  _id: Types.ObjectId;
+
+  @ApiProperty()
+  @Prop({ required: true })
   title: string;
 
-  @Column('text')
+  @ApiProperty()
+  @Prop({ required: true })
   message: string;
 
-  @Column({
-    type: 'enum',
-    enum: NotificationType,
-  })
+  @ApiProperty({ enum: NotificationType })
+  @Prop({ type: String, enum: NotificationType, required: true })
   type: NotificationType;
 
-  @Column({ default: false })
+  @ApiProperty()
+  @Prop({ default: false })
   isRead: boolean;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+export const NotificationSchema = SchemaFactory.createForClass(Notification);

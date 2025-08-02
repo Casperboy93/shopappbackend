@@ -1,37 +1,27 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AuthModule } from './auth/auth.module';
 import { RegistrationRequestModule } from './registration-request/registration-request.module';
-import { RegistrationRequest } from './registration-request/registration-request.entity';
-import { User } from './user/entities/user.entity';
 import { UserModule } from './user/user.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
-import { Subscription } from './subscriptions/entities/subscription.entity';
 import { SupportModule } from './support/support.module';
 import { ServicesModule } from './services/services.module';
-import { SupportMessage } from './support/entities/support-message.entity';
-import { Service } from './services/entities/service.entity';
-import { NotificationsModule } from './notifications/notifications.module';
-import { Notification } from './notifications/entities/notification.entity';
-
 import { ScheduleModule } from '@nestjs/schedule';
-
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    TypeOrmModule.forRootAsync({
+    MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        url: config.get<string>('DATABASE_URL'),
-        ssl: {
-          rejectUnauthorized: false,
-        },
-        synchronize: true, // ⚠️ Disable in production
-        autoLoadEntities: true,
+        uri: config.get<string>('MONGODB_URI'),
+        retryWrites: true,
+        w: 'majority',
+        serverSelectionTimeoutMS: 10000,
+        socketTimeoutMS: 45000,
+        bufferCommands: false,
       }),
     }),
     
@@ -42,7 +32,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     SubscriptionsModule,
     SupportModule,
     ServicesModule,
-    NotificationsModule,
+    // Removed NotificationsModule
   ],
 })
 export class AppModule {}

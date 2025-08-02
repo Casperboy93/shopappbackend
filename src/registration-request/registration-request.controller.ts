@@ -30,13 +30,13 @@ export class RegistrationRequestController {
   @Roles(UserRole.ADMIN)
   @Post(':id/approve')
   approve(@Param('id') id: string) {
-    return this.service.approve(+id);
+    return this.service.approve(id);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Post(':id/reject')
   reject(@Param('id') id: string) {
-    return this.service.reject(+id);
+    return this.service.reject(id);
   }
 }

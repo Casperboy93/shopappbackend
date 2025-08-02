@@ -39,13 +39,13 @@ export class UserController {
 
   @Get(':id')
   async getUserById(@Param('id') id: string) {
-    const user = await this.userService.findOne(+id);
-
+    const user = await this.userService.findOne(id);
+  
     // Only return if role is USER
-    if (user?.role !== UserRole.USER) {
-      return { statusCode: 404, message: 'User not found' };
+    if (user.role !== UserRole.USER) {
+      throw new NotFoundException('User not found');
     }
-
+  
     return user;
   }
 
@@ -71,19 +71,26 @@ export class UserController {
     return this.userService.update(req.user.id, data);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Patch(':id')
+  updateUser(@Param('id') id: string, @Body() data: UpdateUserDto) {
+    return this.userService.update(id, data);
+  }
+
   @Patch(':id/views')
   incrementViews(@Param('id') id: string) {
-    return this.userService.incrementViews(+id);
+    return this.userService.incrementViews(id);
   }
 
   @Patch(':id/phoneviews')
   incrementPhoneViews(@Param('id') id: string) {
-    return this.userService.incrementPhoneViews(+id);
+    return this.userService.incrementPhoneViews(id);
   }
 
   @Patch(':id/rating')
   setRating(@Param('id') id: string, @Body('rating') rating: number) {
-    return this.userService.setRating(+id, rating);
+    return this.userService.setRating(id, rating);
   }
 
   @Get('/by-phone/:phone')

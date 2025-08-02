@@ -15,20 +15,22 @@ export class AuthService {
     private readonly requestService: RegistrationRequestService,
   ) {}
 
-  async validateUser(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
+  async validateUser(phone: string, password: string) {
+    const user = await this.userService.findByPhone(phone);
     if (!user) throw new UnauthorizedException('Invalid credentials');
     if (user.status !== UserStatus.ACTIVE) throw new UnauthorizedException('Account not approved yet');
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+    if (user.password && password) {
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) throw new UnauthorizedException('Invalid credentials');
+    }
 
     return user;
   }
 
   async login(dto: LoginDto) {
-    const user = await this.validateUser(dto.email, dto.password);
-    const payload = { sub: user.id, role: user.role };
+    const user = await this.validateUser(dto.phone, dto.password);
+    const payload = { sub: user._id, role: user.role };
     return {
       access_token: this.jwtService.sign(payload),
       user,
@@ -36,18 +38,18 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto) {
-    // Check for existing email in Users
+    // Check for existing phone in Users
     try {
-      await this.userService.findByEmail(dto.email);
-      throw new BadRequestException('Email already registered');
+      await this.userService.findByPhone(dto.phone);
+      throw new BadRequestException('Phone number already registered');
     } catch (e) {
       // continue if not found
     }
 
-    // Check for existing email in pending requests
+    // Check for existing phone in pending requests
     const requests = await this.requestService.findAll();
-    if (requests.some(r => r.email === dto.email)) {
-      throw new BadRequestException('Email already in registration requests');
+    if (requests.some(r => r.phone === dto.phone)) {
+      throw new BadRequestException('Phone number already in registration requests');
     }
 
     return this.requestService.create(dto);

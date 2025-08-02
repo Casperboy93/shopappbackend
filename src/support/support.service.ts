@@ -1,54 +1,44 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { NotificationsService } from '../notifications/notifications.service';
-import { NotificationType } from '../notifications/entities/notification.entity';
-import { SupportMessage } from './entities/support-message.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { SupportMessage, SupportMessageDocument } from './entities/support-message.entity';
 import { CreateSupportMessageDto } from './dto/create-support-message.dto';
 import { UpdateSupportMessageDto } from './dto/update-support-message.dto';
 
 @Injectable()
 export class SupportService {
   constructor(
-    @InjectRepository(SupportMessage)
-    private readonly supportRepo: Repository<SupportMessage>,
-    private readonly notificationsService: NotificationsService,
+    @InjectModel(SupportMessage.name)
+    private readonly supportModel: Model<SupportMessageDocument>,
   ) {}
 
   async create(dto: CreateSupportMessageDto) {
-    const message = this.supportRepo.create(dto);
-    const saved = await this.supportRepo.save(message);
-
-    // 🛎 Create notification on new support message
-    await this.notificationsService.create({
-      title: 'New Support Message',
-      message: `From ${saved.fullName}: "${saved.title}"`,
-      type: NotificationType.SUPPORT,
-    });
-
+    const message = new this.supportModel(dto);
+    const saved = await message.save();
+    
+    // Log instead of creating notification
+    console.log(`New support message from ${saved.fullName}: "${saved.title}"`);
+    
     return saved;
   }
 
-  findAll() {
-    return this.supportRepo.find();
+  async findAll() {
+    return this.supportModel.find().exec();
   }
 
-  findOne(id: number) {
-    return this.supportRepo.findOneBy({ id });
+  async findOne(id: string) {
+    return this.supportModel.findById(id).exec();
   }
 
-  async update(id: number, dto: UpdateSupportMessageDto) {
-    const message = await this.supportRepo.findOneBy({ id });
+  async update(id: string, dto: UpdateSupportMessageDto) {
+    const message = await this.supportModel.findByIdAndUpdate(id, dto, { new: true }).exec();
     if (!message) throw new NotFoundException('Message not found');
-
-    Object.assign(message, dto);
-    return this.supportRepo.save(message);
+    return message;
   }
 
-  async remove(id: number) {
-    const message = await this.supportRepo.findOneBy({ id });
+  async remove(id: string) {
+    const message = await this.supportModel.findByIdAndDelete(id).exec();
     if (!message) throw new NotFoundException('Message not found');
-
-    await this.supportRepo.remove(message);
+    return message;
   }
 }

@@ -1,4 +1,11 @@
-import { IsEmail, IsOptional, IsString, MinLength } from 'class-validator';
+import { Prop } from '@nestjs/mongoose';
+import {
+  IsEmail,
+  IsOptional,
+  IsString,
+  MinLength,
+  IsDateString,
+} from 'class-validator';
 
 export class CreateRegistrationRequestDto {
   @IsString()
@@ -7,33 +14,42 @@ export class CreateRegistrationRequestDto {
   @IsString()
   lastName: string;
 
+  @IsOptional()
   @IsEmail()
-  email: string;
+  email?: string;
 
+  @IsOptional()
   @MinLength(6)
-  password: string;
+  password?: string;
+
+  @IsString()
+  phone: string;
 
   @IsOptional()
-  phone?: string;
-
-  @IsOptional()
+  @IsDateString()
   dob?: Date;
 
   @IsOptional()
+  @IsString()
   city?: string;
 
   @IsOptional()
+  @IsString()
   address?: string;
 
   @IsOptional()
+  @IsString()
   profileImg?: string;
 
   @IsOptional()
-  portfolio?: string;
-
-  @IsOptional()
+  @IsString()
   job?: string;
 
   @IsOptional()
+  @IsString()
   description?: string;
+
+  @IsOptional()
+  @IsString()
+  portfolio?: string;
 }

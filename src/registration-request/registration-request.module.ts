@@ -1,13 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { RegistrationRequest } from './registration-request.entity';
+import { MongooseModule } from '@nestjs/mongoose';
+import { RegistrationRequest, RegistrationRequestSchema } from './registration-request.entity';
 import { RegistrationRequestService } from './registration-request.service';
 import { RegistrationRequestController } from './registration-request.controller';
-import { NotificationsModule } from '../notifications/notifications.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([RegistrationRequest]), UserModule, NotificationsModule],
+  imports: [MongooseModule.forFeature([{ name: RegistrationRequest.name, schema: RegistrationRequestSchema }]), UserModule],
   providers: [RegistrationRequestService],
   controllers: [RegistrationRequestController],
   exports: [RegistrationRequestService],

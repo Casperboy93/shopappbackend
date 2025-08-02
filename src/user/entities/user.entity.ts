@@ -1,6 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
-import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 
 export enum UserRole {
   USER = 'USER',
@@ -13,86 +13,89 @@ export enum UserStatus {
   NOT_APPROVED = 'notapproved',
 }
 
-@Entity()
+export type UserDocument = User & Document;
+
+@Schema({ timestamps: true })
 export class User {
-  @PrimaryGeneratedColumn()
-  id: number;
+  _id?: any; // Mongoose auto-generated _id
 
   @ApiProperty()
-  @Column()
+  @Prop({ required: true })
   firstName: string;
 
   @ApiProperty()
-  @Column()
+  @Prop({ required: true })
   lastName: string;
 
   @ApiProperty()
-  @Column({ unique: true })
-  email: string;
+  @Prop()
+  @ApiProperty()
+  @Prop({ unique: true })
+  email?: string;
 
   @ApiProperty()
-  @Column()
-  password: string;
+  @Prop()
+  password?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  phone: string;
+  @Prop()
+  @ApiProperty()
+  @Prop({ unique: true })
+  phone?: string;
 
   @ApiProperty()
-  @Column({ type: 'date', nullable: true })
-  dob: Date;
+  @Prop({ type: Date })
+  dob?: Date;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  city: string;
+  @Prop()
+  city?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  address: string;
+  @Prop()
+  address?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  profileImg: string;
+  @Prop()
+  profileImg?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  portfolio: string;
+  @Prop()
+  portfolio?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  job: string;
+  @Prop()
+  job?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  description: string;
+  @Prop()
+  description?: string;
 
   @ApiProperty()
-  @Column({ default: 0 })
+  @Prop({ default: 0 })
   views: number;
 
   @ApiProperty()
-  @Column({ default: 0 })
+  @Prop({ default: 0 })
   phoneViews: number;
 
   @ApiProperty()
-  @Column({ type: 'float', default: 0 })
+  @Prop({ type: Number, default: 0 })
   rating: number;
 
   @ApiProperty({ enum: UserRole })
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  @Prop({ type: String, enum: UserRole, default: UserRole.USER })
   role: UserRole;
 
   @ApiProperty({ enum: UserStatus })
-  @Column({ type: 'enum', enum: UserStatus, default: UserStatus.NOT_APPROVED })
+  @Prop({ type: String, enum: UserStatus, default: UserStatus.NOT_APPROVED })
   status: UserStatus;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  @Prop({ type: [{ type: Types.ObjectId, ref: 'Subscription' }] })
+  subscriptions: Types.ObjectId[];
 
-  @UpdateDateColumn()
-  updatedAt: Date;
-
-  @OneToMany(() => Subscription, (subscription) => subscription.user)
-  subscriptions: Subscription[];
-
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+export const UserSchema = SchemaFactory.createForClass(User);

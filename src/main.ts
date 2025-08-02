@@ -4,14 +4,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
-import { seedAdminAndData } from './scripts/seed'; // seed.ts
+import { seedAdminAndData } from './scripts/seed'; // Uncommented
 
 async function bootstrap() {
   dotenv.config();
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({
-    origin: 'https://uncomplicated.onrender.com',
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
     credentials: true,
   });
 
@@ -31,7 +31,7 @@ async function bootstrap() {
 
   // ✅ Run the seed logic
   try {
-    await seedAdminAndData();
+    await seedAdminAndData(app); // Uncommented
     console.log('✅ Seed executed successfully (admin/users/services)');
   } catch (err) {
     console.error('❌ Seed failed:', err.message);

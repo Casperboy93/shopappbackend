@@ -1,42 +1,39 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Service } from './entities/service.entity';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Service, ServiceDocument } from './entities/service.entity';
 import { CreateServiceDto } from './dto/create-service.dto';
 import { UpdateServiceDto } from './dto/update-service.dto';
 
 @Injectable()
 export class ServicesService {
   constructor(
-    @InjectRepository(Service)
-    private readonly serviceRepo: Repository<Service>,
+    @InjectModel(Service.name)
+    private readonly serviceModel: Model<ServiceDocument>,
   ) {}
 
-  create(dto: CreateServiceDto) {
-    const service = this.serviceRepo.create(dto);
-    return this.serviceRepo.save(service);
+  async create(dto: CreateServiceDto) {
+    const service = new this.serviceModel(dto);
+    return service.save();
   }
 
-  findAll() {
-    return this.serviceRepo.find();
+  async findAll() {
+    return this.serviceModel.find().exec();
   }
 
-  findOne(id: number) {
-    return this.serviceRepo.findOneBy({ id });
+  async findOne(id: string) {
+    return this.serviceModel.findById(id).exec();
   }
 
-  async update(id: number, dto: UpdateServiceDto) {
-    const service = await this.serviceRepo.findOneBy({ id });
+  async update(id: string, dto: UpdateServiceDto) {
+    const service = await this.serviceModel.findByIdAndUpdate(id, dto, { new: true }).exec();
     if (!service) throw new NotFoundException('Service not found');
-
-    Object.assign(service, dto);
-    return this.serviceRepo.save(service);
+    return service;
   }
 
-  async remove(id: number) {
-    const service = await this.serviceRepo.findOneBy({ id });
+  async remove(id: string) {
+    const service = await this.serviceModel.findByIdAndDelete(id).exec();
     if (!service) throw new NotFoundException('Service not found');
-
-    await this.serviceRepo.remove(service);
+    return service;
   }
 }

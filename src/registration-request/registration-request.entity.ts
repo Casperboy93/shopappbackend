@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn } from 'typeorm';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
 import { ApiProperty } from '@nestjs/swagger';
 
 export enum RegistrationRequestStatus {
@@ -8,63 +9,64 @@ export enum RegistrationRequestStatus {
   NOT_APPROVED = 'notapproved',
 }
 
-@Entity()
-export class RegistrationRequest {
-  @PrimaryGeneratedColumn()
-  id: number;
+export type RegistrationRequestDocument = RegistrationRequest & Document;
 
+@Schema({ timestamps: true })
+export class RegistrationRequest {
   @ApiProperty()
-  @Column()
+  @Prop({ required: true })
   firstName: string;
 
   @ApiProperty()
-  @Column()
+  @Prop({ required: true })
   lastName: string;
 
   @ApiProperty()
-  @Column({ unique: true })
-  email: string;
+  @Prop({ required: false })
+  email?: string;
 
   @ApiProperty()
-  @Column()
-  password: string;
+  @Prop({ required: false })
+  password?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
+  @Prop({ required: true, unique: true })
   phone: string;
 
   @ApiProperty()
-  @Column({ type: 'date', nullable: true })
-  dob: Date;
+  @Prop({ type: Date, required: false })
+  dob?: Date;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  city: string;
+  @Prop({ required: false })
+  city?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  address: string;
+  @Prop({ required: false })
+  address?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  profileImg: string;
+  @Prop({ required: false })
+  profileImg?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  portfolio: string;
+  @Prop({ required: false })
+  portfolio?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  job: string;
+  @Prop({ required: false })
+  job?: string;
 
   @ApiProperty()
-  @Column({ nullable: true })
-  description: string;
+  @Prop({ required: false })
+  description?: string;
 
   @ApiProperty({ enum: RegistrationRequestStatus })
-  @Column({ type: 'enum', enum: RegistrationRequestStatus, default: RegistrationRequestStatus.PENDING })
+  @Prop({ type: String, enum: RegistrationRequestStatus, default: RegistrationRequestStatus.PENDING })
   status: RegistrationRequestStatus;
 
-  @CreateDateColumn()
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
+
+export const RegistrationRequestSchema = SchemaFactory.createForClass(RegistrationRequest);

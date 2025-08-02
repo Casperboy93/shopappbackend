@@ -1,13 +1,11 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { MongooseModule } from '@nestjs/mongoose';
 import { SupportService } from './support.service';
 import { SupportController } from './support.controller';
-import { SupportMessage } from './entities/support-message.entity';
-import { NotificationsModule } from '../notifications/notifications.module';
-
+import { SupportMessage, SupportMessageSchema } from './entities/support-message.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([SupportMessage]), NotificationsModule],
+  imports: [MongooseModule.forFeature([{ name: SupportMessage.name, schema: SupportMessageSchema }])],
   controllers: [SupportController],
   providers: [SupportService],
 })
