@@ -39,53 +39,94 @@ export async function seedAdminAndData(app: INestApplication) {
       console.log('ℹ️ Admin already exists');
     }
 
-    // Create 20 test users with different jobs and cities
-    const cities = ['Casablanca', 'Rabat', 'Fes', 'Marrakech', 'Tangier', 'Agadir', 'Meknes', 'Oujda'];
+    // Moroccan cities
+    const cities = ['Casablanca', 'Rabat', 'Fes', 'Marrakech', 'Tangier', 'Agadir', 'Meknes', 'Oujda', 'Tetouan', 'Kenitra', 'Sale', 'Temara'];
+    
+    // Real Moroccan names
+    const moroccanNames = [
+      { firstName: 'Ahmed', lastName: 'Benali' },
+      { firstName: 'Fatima', lastName: 'Zahra' },
+      { firstName: 'Mohamed', lastName: 'Alami' },
+      { firstName: 'Aicha', lastName: 'Bennani' },
+      { firstName: 'Youssef', lastName: 'Idrissi' },
+      { firstName: 'Khadija', lastName: 'Tazi' },
+      { firstName: 'Omar', lastName: 'Fassi' },
+      { firstName: 'Zineb', lastName: 'Chraibi' },
+      { firstName: 'Karim', lastName: 'Benjelloun' },
+      { firstName: 'Nadia', lastName: 'Lahlou' },
+      { firstName: 'Rachid', lastName: 'Berrada' },
+      { firstName: 'Samira', lastName: 'Kettani' },
+      { firstName: 'Hassan', lastName: 'Tounsi' },
+      { firstName: 'Leila', lastName: 'Amrani' },
+      { firstName: 'Abdelkader', lastName: 'Zniber' },
+      { firstName: 'Malika', lastName: 'Benkirane' },
+      { firstName: 'Driss', lastName: 'Guerraoui' },
+      { firstName: 'Souad', lastName: 'Filali' },
+      { firstName: 'Mustapha', lastName: 'Benabdellah' },
+      { firstName: 'Rajae', lastName: 'Mekouar' },
+      { firstName: 'Khalid', lastName: 'Benslimane' },
+      { firstName: 'Houda', lastName: 'Benali' },
+      { firstName: 'Said', lastName: 'Cherkaoui' },
+      { firstName: 'Amina', lastName: 'Benomar' },
+      { firstName: 'Brahim', lastName: 'Laazizi' },
+      { firstName: 'Nezha', lastName: 'Hayat' },
+      { firstName: 'Abderrahim', lastName: 'Bouazza' },
+      { firstName: 'Latifa', lastName: 'Akhannouch' },
+      { firstName: 'Jamal', lastName: 'Eddine' },
+      { firstName: 'Widad', lastName: 'Zemmouri' }
+    ];
+    
     const jobs = [
       'Software Engineer', 'Teacher', 'Doctor', 'Lawyer', 'Designer', 
       'Accountant', 'Chef', 'Photographer', 'Writer', 'Architect',
       'Marketing Specialist', 'Nurse', 'Engineer', 'Consultant', 'Artist',
-      'Translator', 'Mechanic', 'Electrician', 'Plumber', 'Carpenter'
+      'Translator', 'Mechanic', 'Electrician', 'Plumber', 'Carpenter',
+      'Pharmacist', 'Dentist', 'Journalist', 'Real Estate Agent', 'Banker',
+      'Shop Owner', 'Taxi Driver', 'Hairdresser', 'Tailor', 'Baker'
     ];
     
-    const createdUsers: any[] = []; // Fix: Properly type the array
+    const createdUsers: any[] = [];
     
-    for (let i = 1; i <= 20; i++) {
-      const email = `user${i}@test.com`;
-      const existing = await UserModel.findOne({ email });
+    // Create 30 Moroccan users
+    for (let i = 0; i < 30; i++) {
+      const name = moroccanNames[i];
+      const phone = `06${Math.floor(Math.random() * 90000000 + 10000000)}`; // Random Moroccan phone
+      
+      const existing = await UserModel.findOne({ phone });
       if (!existing) {
+        // Random age between 18-40
+        const age = Math.floor(Math.random() * 23) + 18; // 18-40 years
+        const birthYear = new Date().getFullYear() - age;
+        const birthMonth = Math.floor(Math.random() * 12);
+        const birthDay = Math.floor(Math.random() * 28) + 1;
+        
         const user = await UserModel.create({
-          firstName: `User${i}`,
-          lastName: 'Test',
-          email,
-          password: await bcrypt.hash('password123', 10),
-          phone: `06000000${i.toString().padStart(2, '0')}`,
-          dob: new Date('1995-01-01'),
-          city: cities[i % cities.length],
-          address: `${i * 10} Street`,
-          job: jobs[i - 1],
-          description: `Professional ${jobs[i - 1]} with extensive experience in ${cities[i % cities.length]}. Providing high-quality services to clients.`,
+          firstName: name.firstName,
+          lastName: name.lastName,
+          phone,
+          dob: new Date(birthYear, birthMonth, birthDay),
+          city: cities[Math.floor(Math.random() * cities.length)],
+          address: `${Math.floor(Math.random() * 999) + 1} Rue ${Math.floor(Math.random() * 50) + 1}`,
+          job: jobs[Math.floor(Math.random() * jobs.length)],
+          description: `Professional ${jobs[Math.floor(Math.random() * jobs.length)].toLowerCase()} providing quality services in Morocco.`,
           status: UserStatus.ACTIVE,
-          profileImg: `https://i.pravatar.cc/300?img=${i}`,
+          profileImg: `https://i.pravatar.cc/300?img=${i + 50}`,
         });
         createdUsers.push(user);
       } else {
         createdUsers.push(existing);
       }
     }
-    console.log('✅ 20 users created with different jobs and cities');
+    console.log('✅ 30 Moroccan users created');
 
-    // Create subscriptions for 10 random users with durations between 2-20 days
-    const usersToSubscribe = createdUsers.slice(0, 10); // Take first 10 users
-    
-    for (let i = 0; i < usersToSubscribe.length; i++) {
-      const user = usersToSubscribe[i];
+    // Create subscriptions for all users with random durations between 0-45 days
+    for (let i = 0; i < createdUsers.length; i++) {
+      const user = createdUsers[i];
       
-      // Check if subscription already exists for this user
       const existingSubscription = await SubscriptionModel.findOne({ user: user._id });
       if (!existingSubscription) {
-        // Generate random duration between 2-20 days
-        const randomDuration = Math.floor(Math.random() * 19) + 2; // 2-20 days
+        // Generate random duration between 0-45 days
+        const randomDuration = Math.floor(Math.random() * 46); // 0-45 days
         
         const startDate = new Date();
         const endDate = new Date();
@@ -97,7 +138,6 @@ export async function seedAdminAndData(app: INestApplication) {
           endDate: endDate,
         });
         
-        // Add subscription to user's subscriptions array
         await UserModel.findByIdAndUpdate(
           user._id,
           { $push: { subscriptions: subscription._id } },
@@ -107,29 +147,50 @@ export async function seedAdminAndData(app: INestApplication) {
         console.log(`✅ Subscription created for ${user.firstName} ${user.lastName} (${randomDuration} days)`);
       }
     }
-    console.log('✅ 10 users subscribed with random durations (2-20 days)');
+    console.log('✅ All users subscribed with random durations (0-45 days)');
 
-    // Create 6 services in different cities
-    const serviceCities = ['Casablanca', 'Rabat', 'Fes', 'Marrakech', 'Tangier', 'Agadir'];
-    const serviceNames = ['Web Development', 'Graphic Design', 'Digital Marketing', 'Photography', 'Translation', 'Consulting'];
+    // Create 10 services with varying city coverage (2-9 cities each)
+    const allCities = ['Casablanca', 'Rabat', 'Fes', 'Marrakech', 'Tangier', 'Agadir', 'Meknes', 'Oujda', 'Tetouan', 'Kenitra', 'Sale', 'Temara'];
+    const serviceTypes = [
+      'Shopping & Personal Assistant',
+      'Food Delivery',
+      'Transportation & Taxi',
+      'Home Cleaning',
+      'Plumbing Services',
+      'Electrical Services',
+      'Beauty & Hairdressing',
+      'Tutoring & Education',
+      'Pet Care',
+      'Gardening & Landscaping'
+    ];
     
-    for (let i = 1; i <= 6; i++) {
-      const existingService = await ServiceModel.findOne({ serviceName: serviceNames[i - 1] });
+    for (let i = 0; i < 10; i++) {
+      const serviceName = serviceTypes[i];
+      const existingService = await ServiceModel.findOne({ serviceName });
+      
       if (!existingService) {
+        // Random number of cities between 2-9
+        const numCities = Math.floor(Math.random() * 8) + 2; // 2-9 cities
+        const shuffledCities = [...allCities].sort(() => 0.5 - Math.random());
+        const selectedCities = shuffledCities.slice(0, numCities);
+        
         await ServiceModel.create({
-          serviceName: serviceNames[i - 1],
-          pricing: 100 + i * 50,
-          description: `Professional ${serviceNames[i - 1].toLowerCase()} services in ${serviceCities[i - 1]}`,
+          serviceName,
+          pricing: Math.floor(Math.random() * 500) + 50, // 50-550 MAD
+          description: `Professional ${serviceName.toLowerCase()} available across multiple Moroccan cities. Quality service guaranteed.`,
           serviceImgs: [
             `https://picsum.photos/seed/service${i}a/300/200`,
             `https://picsum.photos/seed/service${i}b/300/200`,
+            `https://picsum.photos/seed/service${i}c/300/200`,
           ],
-          deliveryTime: `${i + 2} days`,
-          citiesCovered: [serviceCities[i - 1]],
+          deliveryTime: `${Math.floor(Math.random() * 7) + 1}-${Math.floor(Math.random() * 7) + 8} days`,
+          citiesCovered: selectedCities,
         });
+        
+        console.log(`✅ Service '${serviceName}' created covering ${numCities} cities: ${selectedCities.join(', ')}`);
       }
     }
-    console.log('✅ 6 services created in different cities');
+    console.log('✅ 10 services created with varying city coverage (2-9 cities each)');
 
     console.log('✅ Seed completed successfully');
   } catch (error) {
