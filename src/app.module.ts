@@ -19,15 +19,14 @@ import { ScheduleModule } from '@nestjs/schedule';
         uri: config.get<string>('DATABASE_URL'),
         retryWrites: true,
         w: 'majority',
-        serverSelectionTimeoutMS: 30000, // Increased from 10000
-        socketTimeoutMS: 60000, // Increased from 45000
-        connectTimeoutMS: 30000, // Added
-        maxPoolSize: 10, // Added
-        minPoolSize: 1, // Added
-        maxIdleTimeMS: 30000, // Added
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 60000,
+        connectTimeoutMS: 30000,
+        maxPoolSize: 10,
+        minPoolSize: 1,
+        maxIdleTimeMS: 30000,
         bufferCommands: false,
-        bufferMaxEntries: 0, // Added
-        authSource: 'admin', // Added
+        authSource: 'admin',
       }),
     }),
     
