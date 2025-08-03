@@ -1,0 +1,3 @@
+0f38day4QdwMLpq3
+
+mongodb+srv://studiosmedart:0f38day4QdwMLpq3@cluster0.qanerif.mongodb.net/
