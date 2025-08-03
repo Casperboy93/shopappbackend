@@ -4,7 +4,8 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
-import { seedAdminAndData } from './scripts/seed'; // Uncommented
+// Only import seed in development or when explicitly needed
+// import { seedAdminAndData } from './scripts/seed';
 
 async function bootstrap() {
   dotenv.config();
@@ -27,14 +28,20 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api/docs', app, document);
 
-  await app.listen(process.env.PORT || 3000);
+  // Fix port binding for Render.com
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
+  console.log(`Application is running on port ${port}`);
 
-  // ✅ Run the seed logic
-  try {
-    await seedAdminAndData(app); // Uncommented
-    console.log('✅ Seed executed successfully (admin/users/services)');
-  } catch (err) {
-    console.error('❌ Seed failed:', err.message);
+  // Only run seed in development or when ENABLE_SEED is true
+  if (process.env.NODE_ENV === 'development' || process.env.ENABLE_SEED === 'true') {
+    try {
+      const { seedAdminAndData } = await import('./scripts/seed');
+      await seedAdminAndData(app);
+      console.log('✅ Seed executed successfully (admin/users/services)');
+    } catch (err) {
+      console.error('❌ Seed failed:', err.message);
+    }
   }
 }
 
