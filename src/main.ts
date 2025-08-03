@@ -4,8 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 
-// Only import seed in development or when explicitly needed
-// import { seedAdminAndData } from './scripts/seed';
+import { seedAdminAndData } from './scripts/seed';
 
 async function bootstrap() {
   dotenv.config();
@@ -33,15 +32,12 @@ async function bootstrap() {
   await app.listen(port, '0.0.0.0');
   console.log(`Application is running on port ${port}`);
 
-  // Only run seed in development or when ENABLE_SEED is true
-  if (process.env.NODE_ENV === 'development' || process.env.ENABLE_SEED === 'true') {
-    try {
-      const { seedAdminAndData } = await import('./scripts/seed');
-      await seedAdminAndData(app);
-      console.log('✅ Seed executed successfully (admin/users/services)');
-    } catch (err) {
-      console.error('❌ Seed failed:', err.message);
-    }
+  // Run the lightweight seed logic
+  try {
+    await seedAdminAndData(app);
+    console.log('✅ Seed executed successfully (admin only)');
+  } catch (err) {
+    console.error('❌ Seed failed:', err.message);
   }
 }
 
