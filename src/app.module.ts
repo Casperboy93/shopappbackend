@@ -16,7 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        uri: config.get<string>('MONGODB_URI'),
+        uri: config.get<string>('DATABASE_URL'),
         retryWrites: true,
         w: 'majority',
         serverSelectionTimeoutMS: 10000,
