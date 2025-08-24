@@ -26,7 +26,6 @@ import { ScheduleModule } from '@nestjs/schedule';
         minPoolSize: 1,
         maxIdleTimeMS: 30000,
         bufferCommands: false,
-        authSource: 'admin',
       }),
     }),
     
