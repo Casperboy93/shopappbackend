@@ -15,7 +15,8 @@ async function bootstrap() {
       process.env.CORS_ORIGIN || 'http://localhost:5173',
       process.env.FRONTEND_URL || 'http://localhost:5173',
       'https://uncomplicated.onrender.com',
-      'http://localhost:5173'
+      'http://beauservice.com',
+      'https://www.beauservice.com',
     ].filter(Boolean),
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
