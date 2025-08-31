@@ -12,7 +12,8 @@ async function bootstrap() {
 
   app.enableCors({
     origin: [
-      process.env.CORS_ORIGIN || 'http://localhost:5173',
+      process.env.CORS_ORIGIN || 'http://localhost:5173','http://beauservice.com',
+      'https://www.beauservice.com',
       process.env.FRONTEND_URL || 'http://localhost:5173',
       'https://uncomplicated.onrender.com',
       'http://beauservice.com',
